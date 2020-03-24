@@ -21,16 +21,18 @@ package org.envirocar.app.views.carselection;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,32 +42,26 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.envirocar.app.BaseApplicationComponent;
 import org.envirocar.app.R;
-import org.envirocar.app.handler.DAOProvider;
-import org.envirocar.app.handler.preferences.CarPreferenceHandler;
 import org.envirocar.app.injection.BaseInjectorFragment;
 import org.envirocar.app.retrofit.RetrofitClient;
 import org.envirocar.app.views.utils.ECAnimationUtils;
 import org.envirocar.core.entity.Car;
 import org.envirocar.core.entity.CarImpl;
 import org.envirocar.core.entity.Manufacturer;
+import org.envirocar.core.entity.Vehicle;
 import org.envirocar.core.logging.Logger;
 import org.envirocar.remote.service.VehicleService;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnTextChanged;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -115,29 +111,26 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
 
     @BindView(R.id.sliding_up_panel)
     protected SlidingUpPanelLayout slidingUpPanel;
+    @BindView(R.id.back_icon)
+    protected ImageView backIcon;
+    @BindView(R.id.search_title)
+    protected TextView searchTitle;
+    @BindView(R.id.search_view)
+    protected SearchView searchView;
     @BindView(R.id.brand_list)
     protected RecyclerView brandsRecyclerView;
 
-    @Inject
-    protected DAOProvider daoProvider;
-    @Inject
-    protected CarPreferenceHandler carManager;
-
+    private List<Brand> manufacturersCache = new ArrayList<>();
+    private Manufacturer selectedManufacturer;
+    private Vehicle selectedVehicle;
     private BrandAdapter brandAdapter;
 
     private CompositeDisposable disposables = new CompositeDisposable();
     private Scheduler.Worker mainThreadWorker = AndroidSchedulers.mainThread().createWorker();
 
-    private Set<Car> mCars = new HashSet<>();
-    private Set<String> mManufacturerNames = new HashSet<>();
-    private Map<String, Set<String>> mCarToModelMap = new ConcurrentHashMap<>();
-    private Map<String, Set<String>> mModelToYear = new ConcurrentHashMap<>();
-    private Map<Pair<String, String>, Set<String>> mModelToCCM = new ConcurrentHashMap<>();
-
-
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle
             savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
@@ -166,20 +159,34 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
         contentView.setVisibility(View.GONE);
         downloadView.setVisibility(View.INVISIBLE);
 
-        // Initialize recycler views
+        // Initialize recycler view
         brandsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         brandAdapter = new BrandAdapter();
         brandsRecyclerView.setAdapter(brandAdapter);
-        manufacturerLayout.setOnClickListener(v -> {
+        brandsRecyclerView.addItemDecoration(new DividerItemDecoration(brandsRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
+        manufacturerLayout.setOnClickListener(v -> {
             slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+            setManufacturersSelectView();
+            setManufacturerAdapter(manufacturersCache);
         });
 
+        searchView.setOnClickListener(v -> {
+            searchView.setIconified(false);
+            slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+        });
+
+        backIcon.setOnClickListener(v -> {
+            setManufacturersSelectView();
+            setManufacturerAdapter(manufacturersCache);
+        });
+
+        // Handle toolbar done action
         RxToolbar.itemClicks(toolbar)
 //                .filter(continueWhenFormIsCorrect())
                 .map(createCarFromForm())
                 .filter(continueWhenCarHasCorrectValues())
-                .map(checkCarAlreadyExist())
+//                .map(checkCarAlreadyExist())
                 .subscribeWith(new DisposableObserver<Car>() {
                     @Override
                     public void onComplete() {
@@ -234,13 +241,13 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
 
                     @Override
                     protected void onStart() {
-                        LOG.info("onStart() download sensors");
+                        LOG.info("onStart() download manufacturers");
                         downloadView.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onComplete() {
-                        LOG.info("onCompleted(): cars successfully downloaded.");
+                        LOG.info("onCompleted(): manufacturers successfully downloaded.");
 
                         mainThreadWorker.schedule(() -> {
                             dispose();
@@ -258,15 +265,110 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
 
                     @Override
                     public void onNext(List<Manufacturer> manufacturers) {
-                        List<String> manufacturersList = new ArrayList<>();
+                        Collections.sort(manufacturers, (a, b) -> a.getName().compareTo(b.getName()));
+                        ArrayList<Brand> brands = new ArrayList<>();
                         for (Manufacturer manufacturer : manufacturers) {
-                            manufacturersList.add(manufacturer.getName());
+                            brands.add(new Brand(manufacturer, null));
                         }
 
-                        Collections.sort(manufacturersList, String::compareTo);
-                        getActivity().runOnUiThread(() -> brandAdapter.setItems(manufacturersList));
+                        manufacturersCache.addAll(brands);
+
+                        getActivity().runOnUiThread(() -> {
+                            setManufacturerAdapter(brands);
+                        });
                     }
                 }));
+    }
+
+    private void fetchVehiclesByManufacturer(String hsn) {
+        VehicleService vehicleService = RetrofitClient.getRetrofit(getContext()).create(VehicleService.class);
+
+        disposables.add(vehicleService.fetchVehiclesByManufacturer(hsn)
+                .toFlowable(BackpressureStrategy.BUFFER)
+                .onBackpressureBuffer(10000)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .toObservable()
+                .subscribeWith(new DisposableObserver<List<Vehicle>>() {
+
+                    @Override
+                    protected void onStart() {
+                        LOG.info("onStart() download vehicles by manufacturer");
+                        downloadView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LOG.info("onCompleted(): vehicles successfully downloaded.");
+
+                        mainThreadWorker.schedule(() -> {
+                            dispose();
+                            downloadView.setVisibility(View.INVISIBLE);
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        LOG.error(e.getMessage(), e);
+                        mainThreadWorker.schedule(() -> {
+                            downloadView.setVisibility(View.INVISIBLE);
+                        });
+                    }
+
+                    @Override
+                    public void onNext(List<Vehicle> vehicles) {
+                        Collections.sort(vehicles, (a, b) -> a.getCommercialName().compareTo(b.getCommercialName()));
+                        ArrayList<Brand> brands = new ArrayList<>();
+                        for (Vehicle vehicle : vehicles) {
+                            brands.add(new Brand(null, vehicle));
+                        }
+
+                        getActivity().runOnUiThread(() -> {
+                            setModelsSelectView();
+                            setModelsAdapter(brands);
+                        });
+                    }
+                }));
+    }
+
+    private void setManufacturersSelectView() {
+        searchTitle.setText(getString(R.string.label_select_manufacturer));
+        backIcon.setVisibility(View.GONE);
+    }
+
+    private void setModelsSelectView() {
+        searchTitle.setText(getString(R.string.label_select_model));
+        backIcon.setVisibility(View.VISIBLE);
+    }
+
+    private void setManufacturerAdapter(List<Brand> brands) {
+        brandAdapter.clear();
+        brandAdapter.set(brands, brand -> {
+            Manufacturer manufacturer = brand.getManufacturer();
+            if (manufacturer != null) {
+                selectedManufacturer = manufacturer;
+                fetchVehiclesByManufacturer(brand.getManufacturer().getHsn());
+                manufacturerText.setText(selectedManufacturer.getName());
+            }
+        });
+        brandsRecyclerView.scrollToPosition(0);
+    }
+
+    private void setModelsAdapter(List<Brand> brands) {
+        brandAdapter.clear();
+        brandAdapter.set(brands, brand -> {
+            Vehicle vehicle = brand.getVehicle();
+            if (vehicle != null) {
+                selectedVehicle = vehicle;
+                slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+
+                // TODO: Fix keyboard
+                hideKeyboard(getView());
+
+                manufacturerText.setText(selectedManufacturer.getName() + " " + selectedVehicle.getCommercialName());
+            }
+        });
+        brandsRecyclerView.scrollToPosition(0);
     }
 
     private <T> Function<T, Car> createCarFromForm() {
@@ -321,110 +423,9 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
         };
     }
 
-    private Function<Car, Car> checkCarAlreadyExist() {
-        return car -> {
-            String manu = car.getManufacturer();
-            String model = car.getModel();
-            String year = "" + car.getConstructionYear();
-            String engine = "" + car.getEngineDisplacement();
-            Pair<String, String> modelYear = new Pair<>(model, year);
+    void closeThisFragment() {
+        slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 
-            Car selectedCar = null;
-            if (mManufacturerNames.contains(manu)
-                    && mCarToModelMap.get(manu) != null
-                    && mCarToModelMap.get(manu).contains(model)
-                    && mModelToYear.get(model) != null
-                    && mModelToYear.get(model).contains(year)
-                    && mModelToCCM.get(modelYear) != null
-                    && mModelToCCM.get(modelYear).contains(engine)) {
-                for (Car other : mCars) {
-                    if (other.getManufacturer().equals(manu)
-                            && other.getModel().equals(model)
-                            && other.getConstructionYear() == car.getConstructionYear()
-                            && other.getEngineDisplacement() == car.getEngineDisplacement()
-                            && other.getFuelType() == car.getFuelType()) {
-                        selectedCar = other;
-                        break;
-                    }
-                }
-            }
-
-            if (selectedCar == null) {
-                LOG.info("New Car type. Register car at server.");
-                carManager.registerCarAtServer(car);
-                return car;
-            } else {
-                LOG.info(String.format("Car already existed -> [%s]", selectedCar.getId()));
-                return selectedCar;
-            }
-        };
-    }
-
-    private void checkFuelingType() {
-        String[] make = manufacturerText.getText().toString().split("\\s+");
-        String manufacturer = make[0];
-        String model = make[1];
-        String engineString = engineText.getText().toString();
-        Pair<String, String> modelYear = new Pair<>(model, constructionYearText.toString());
-
-        Car selectedCar = null;
-        if (mManufacturerNames.contains(manufacturer)
-                && mCarToModelMap.get(manufacturer) != null
-                && mCarToModelMap.get(manufacturer).contains(model)
-                && mModelToYear.get(model) != null
-                && mModelToYear.get(model).contains(constructionYearText.toString())
-                && mModelToCCM.get(modelYear) != null
-                && mModelToCCM.get(modelYear).contains(engineString)) {
-            for (Car other : mCars) {
-                if (other.getManufacturer() == null ||
-                        other.getModel() == null ||
-                        other.getConstructionYear() == 0 ||
-                        other.getEngineDisplacement() == 0 ||
-                        other.getFuelType() == null) {
-                    continue;
-                }
-                if (other.getManufacturer().equals(manufacturer)
-                        && other.getModel().equals(model)
-                        && other.getConstructionYear() == Integer.parseInt(constructionYearText.toString())
-                        && other.getEngineDisplacement() == Integer.parseInt(engineString)) {
-                    selectedCar = other;
-                    break;
-                }
-            }
-        }
-
-//        if (selectedCar != null && selectedCar.getFuelType() != null) {
-//            fueltypeText.setText(selectedCar.getFuelType().toString());
-//        }
-    }
-
-    private void addCarToAutocompleteList(Car car) {
-
-        mCars.add(car);
-        String manufacturer = car.getManufacturer().trim();
-        String model = car.getModel().trim();
-        String year = Integer.toString(car.getConstructionYear());
-
-        if (manufacturer.isEmpty() || model.isEmpty() || year.isEmpty())
-            return;
-
-        mManufacturerNames.add(manufacturer);
-
-        if (!mCarToModelMap.containsKey(manufacturer))
-            mCarToModelMap.put(manufacturer, new HashSet<>());
-        mCarToModelMap.get(manufacturer).add(model);
-
-        if (!mModelToYear.containsKey(model))
-            mModelToYear.put(model, new HashSet<>());
-        mModelToYear.get(model).add(Integer.toString(car.getConstructionYear()));
-
-        Pair<String, String> modelYearPair = new Pair<>(model, year);
-        if (!mModelToCCM.containsKey(modelYearPair))
-            mModelToCCM.put(modelYearPair, new HashSet<>());
-        mModelToCCM.get(modelYearPair).add(Integer.toString(car.getEngineDisplacement()));
-    }
-
-    public void closeThisFragment() {
         ECAnimationUtils.animateHideView(getContext(),
                 ((CarSelectionActivity) getActivity()).overlayView, R.anim.fade_out);
         ECAnimationUtils.animateHideView(getContext(), contentView, R.anim

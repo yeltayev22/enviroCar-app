@@ -83,6 +83,8 @@
     <string name="ok" translatable="false">OK</string>
 
     <string name="label_search">Search</string>
+    <string name="label_select_manufacturer">Select manufacturer ...</string>
+    <string name="label_select_model">Select model ...</string>
 
     <string name="driving">Driving</string>
 

@@ -1,15 +1,15 @@
 package org.envirocar.core.entity;
 
 public class Manufacturer {
-    private int hsn;
+    private String hsn;
     private String name;
 
 
-    public int getHsn() {
+    public String getHsn() {
         return hsn;
     }
 
-    public void setHsn(int hsn) {
+    public void setHsn(String hsn) {
         this.hsn = hsn;
     }
 

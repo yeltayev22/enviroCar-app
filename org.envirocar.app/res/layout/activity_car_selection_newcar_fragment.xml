@@ -20,7 +20,6 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:sothree="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -38,9 +37,9 @@
         app:umanoAnchorPoint="0.6"
         app:umanoInitialState="hidden"
         app:umanoOverlay="false"
-        sothree:umanoPanelHeight="0dp"
-        sothree:umanoShadowHeight="0dp"
-        app:umanoScrollableView="@+id/brand_list">
+        app:umanoPanelHeight="0dp"
+        app:umanoScrollableView="@+id/brand_list"
+        app:umanoShadowHeight="0dp">
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/activity_car_selection_newcar_content_view"
@@ -102,13 +101,22 @@
                         android:src="@drawable/ic_directions_car_black_24dp" />
 
                     <TextView
-                        android:id="@+id/manufacturer_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
+                        android:layout_weight="1"
                         android:text="@string/car_selection_manufacturer"
                         android:textColor="#000000"
                         android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/manufacturer_text"
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:ellipsize="end"
+                        android:gravity="right"
+                        android:textSize="12sp" />
 
                 </LinearLayout>
 
@@ -201,13 +209,30 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/search_title"
-                android:layout_width="wrap_content"
+            <FrameLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_horizontal" />
+                android:layout_margin="16dp">
+
+                <ImageView
+                    android:id="@+id/back_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:rotation="180"
+                    android:src="@drawable/ic_arrow_right" />
+
+                <TextView
+                    android:id="@+id/search_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+            </FrameLayout>
 
             <View
                 android:layout_width="match_parent"
@@ -220,8 +245,11 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:background="@drawable/border_search"
-                app:searchIcon="@drawable/ic_search"
-                app:defaultQueryHint="@string/label_search" />
+                app:defaultQueryHint="@string/label_search"
+                app:queryBackground="@null"
+                app:queryHint="@string/label_search"
+                app:searchHintIcon="@null"
+                app:searchIcon="@drawable/ic_search" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/brand_list"

@@ -1,7 +1,7 @@
 package org.envirocar.core.entity;
 
 public class Vehicle {
-    private int tsn;
+    private String tsn;
     private String commercialName;
     private String allotmentDate;
     private String category;
@@ -14,11 +14,11 @@ public class Vehicle {
     private int seats;
     private int maximumMass;
 
-    public int getTsn() {
+    public String getTsn() {
         return tsn;
     }
 
-    public void setTsn(int tsn) {
+    public void setTsn(String tsn) {
         this.tsn = tsn;
     }
 
