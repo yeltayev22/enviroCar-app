@@ -42,6 +42,7 @@ dependencies {
     implementation rootProject.ext.materialDialogs
     implementation "com.andkulikov:transitionseverywhere:2.0.0"
     implementation 'de.hdodenhof:circleimageview:3.0.1'
+    implementation 'com.sothree.slidinguppanel:library:3.4.0'
 
     // RxBindings
     implementation rootProject.ext.rxBindingCore

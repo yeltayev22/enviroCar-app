@@ -36,4 +36,6 @@
     <color name="envirocar_color_add_card_background">#4757A0</color>
 
     <color name="cario_warning_red">#B00020</color>
+
+    <color name="black">#000000</color>
 </resources>

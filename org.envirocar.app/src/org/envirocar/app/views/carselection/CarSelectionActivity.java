@@ -1,18 +1,18 @@
 /**
  * Copyright (C) 2013 - 2019 the enviroCar community
- *
+ * <p>
  * This file is part of the enviroCar app.
- *
+ * <p>
  * The enviroCar app is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * The enviroCar app is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with the enviroCar app. If not, see http://www.gnu.org/licenses/.
  */
@@ -20,9 +20,12 @@ package org.envirocar.app.views.carselection;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.appcompat.widget.Toolbar;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -169,7 +172,7 @@ public class CarSelectionActivity extends BaseInjectorActivity implements CarSel
             return false;
         }
         ECAnimationUtils.animateShowView(this, overlayView, R.anim.fade_in);
-        ECAnimationUtils.animateHideView(this,mFab, R.anim.fade_out);
+        ECAnimationUtils.animateHideView(this, mFab, R.anim.fade_out);
         this.addCarFragment = new CarSelectionAddCarFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.activity_car_selection_container, this.addCarFragment)
