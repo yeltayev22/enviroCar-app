@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 
     Copyright (C) 2013 - 2019 the enviroCar community
 
@@ -79,12 +78,12 @@
     <string name="general_error_please_report">General Track Error - Please report this issue</string>
 
 
-
     <string name="ok" translatable="false">OK</string>
 
     <string name="label_search">Search</string>
     <string name="label_select_manufacturer">Select manufacturer ...</string>
     <string name="label_select_model">Select model ...</string>
+    <string name="action_select">Select</string>
 
     <string name="driving">Driving</string>
 
@@ -101,7 +100,6 @@
     <!-- ################# -->
     <!-- Sign In / Sign Up -->
     <!-- ################# -->
-
 
 
     <!-- ################# -->

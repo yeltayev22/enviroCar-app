@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.jakewharton.rxbinding3.appcompat.RxToolbar;
 import com.jakewharton.rxbinding3.widget.RxTextView;
+import com.jakewharton.rxbinding3.widget.TextViewAfterTextChangeEvent;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.envirocar.app.BaseApplicationComponent;
@@ -45,6 +46,7 @@ import org.envirocar.app.R;
 import org.envirocar.app.injection.BaseInjectorFragment;
 import org.envirocar.app.retrofit.RetrofitClient;
 import org.envirocar.app.views.utils.ECAnimationUtils;
+import org.envirocar.app.views.utils.WheelPickerView;
 import org.envirocar.core.entity.Car;
 import org.envirocar.core.entity.CarImpl;
 import org.envirocar.core.entity.Manufacturer;
@@ -61,7 +63,6 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnTextChanged;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -76,7 +77,7 @@ import io.reactivex.schedulers.Schedulers;
  *
  * @author dewall
  */
-public class CarSelectionAddCarFragment extends BaseInjectorFragment {
+public class CarSelectionAddCarFragment extends BaseInjectorFragment implements SlidingUpPanelLayout.PanelSlideListener {
     private static final Logger LOG = Logger.getLogger(CarSelectionAddCarFragment.class);
 
     private static final int ERROR_DEBOUNCE_TIME = 750;
@@ -89,13 +90,13 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
     protected Toolbar toolbar;
     @BindView(R.id.activity_car_selection_newcar_content_view)
     protected View contentView;
-    @BindView(R.id.activity_car_selection_newcar_download_layout)
-    protected View downloadView;
+    @BindView(R.id.loading_layout)
+    protected View loadingView;
 
-    @BindView(R.id.manufacturer_layout)
-    protected LinearLayout manufacturerLayout;
-    @BindView(R.id.manufacturer_text)
-    protected TextView manufacturerText;
+    @BindView(R.id.brand_layout)
+    protected LinearLayout brandLayout;
+    @BindView(R.id.brand_text)
+    protected TextView brandText;
     @BindView(R.id.construction_year_layout)
     protected LinearLayout constructionYearLayout;
     @BindView(R.id.construction_year_text)
@@ -111,6 +112,13 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
 
     @BindView(R.id.sliding_up_panel)
     protected SlidingUpPanelLayout slidingUpPanel;
+    @BindView(R.id.recycler_view_layout)
+    protected LinearLayout recyclerViewLayout;
+    @BindView(R.id.wheel_picker_layout)
+    protected LinearLayout wheelPickerLayout;
+    @BindView(R.id.wheel_picker_view)
+    protected WheelPickerView wheelPickerView;
+
     @BindView(R.id.back_icon)
     protected ImageView backIcon;
     @BindView(R.id.search_title)
@@ -124,6 +132,10 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
     private Manufacturer selectedManufacturer;
     private Vehicle selectedVehicle;
     private BrandAdapter brandAdapter;
+
+    private List<String> years = new ArrayList<>();
+    private List<String> fuelTypes = new ArrayList<>();
+    private List<String> engineTypes = new ArrayList<>();
 
     private CompositeDisposable disposables = new CompositeDisposable();
     private Scheduler.Worker mainThreadWorker = AndroidSchedulers.mainThread().createWorker();
@@ -157,7 +169,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
         // Initialize views' visibility
         toolbar.setVisibility(View.GONE);
         contentView.setVisibility(View.GONE);
-        downloadView.setVisibility(View.INVISIBLE);
+        loadingView.setVisibility(View.INVISIBLE);
 
         // Initialize recycler view
         brandsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -165,20 +177,61 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
         brandsRecyclerView.setAdapter(brandAdapter);
         brandsRecyclerView.addItemDecoration(new DividerItemDecoration(brandsRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
-        manufacturerLayout.setOnClickListener(v -> {
-            slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        // Initialize brand layout views
+        brandLayout.setOnClickListener(v -> {
+            showRecyclerViewLayout();
             setManufacturersSelectView();
             setManufacturerAdapter(manufacturersCache);
         });
-
         searchView.setOnClickListener(v -> {
             searchView.setIconified(false);
             slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
         });
-
         backIcon.setOnClickListener(v -> {
             setManufacturersSelectView();
             setManufacturerAdapter(manufacturersCache);
+        });
+
+        // Initialize construction year layout views
+        constructionYearLayout.setOnClickListener(v -> {
+
+            showWheelPickerLayout();
+
+            years.clear();
+            years.add("2007");
+            years.add("2009");
+            years.add("2010");
+            years.add("2012");
+            years.add("2013");
+            years.add("2016");
+            years.add("2018");
+            wheelPickerView.setData(years);
+        });
+
+        // Initialize fuel type layout views
+        fuelTypeLayout.setOnClickListener(v -> {
+            showWheelPickerLayout();
+
+            fuelTypes.clear();
+            fuelTypes.add("Electric");
+            fuelTypes.add("Benzine");
+            fuelTypes.add("Gas");
+            fuelTypes.add("Hybrid");
+            fuelTypes.add("Diesel");
+            fuelTypes.add("Gas-Hybrid");
+            wheelPickerView.setData(fuelTypes);
+        });
+
+        // Initialize engine capacity layout views
+        engineLayout.setOnClickListener(v -> {
+            showWheelPickerLayout();
+
+            engineTypes.clear();
+            engineTypes.add("1300");
+            engineTypes.add("1400");
+            engineTypes.add("1533");
+            engineTypes.add("1700");
+            wheelPickerView.setData(engineTypes);
         });
 
         // Handle toolbar done action
@@ -242,7 +295,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
                     @Override
                     protected void onStart() {
                         LOG.info("onStart() download manufacturers");
-                        downloadView.setVisibility(View.VISIBLE);
+                        loadingView.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -251,16 +304,14 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
 
                         mainThreadWorker.schedule(() -> {
                             dispose();
-                            downloadView.setVisibility(View.INVISIBLE);
+                            loadingView.setVisibility(View.INVISIBLE);
                         });
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         LOG.error(e.getMessage(), e);
-                        mainThreadWorker.schedule(() -> {
-                            downloadView.setVisibility(View.INVISIBLE);
-                        });
+                        mainThreadWorker.schedule(() -> loadingView.setVisibility(View.INVISIBLE));
                     }
 
                     @Override
@@ -273,9 +324,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
 
                         manufacturersCache.addAll(brands);
 
-                        getActivity().runOnUiThread(() -> {
-                            setManufacturerAdapter(brands);
-                        });
+                        mainThreadWorker.schedule(() -> setManufacturerAdapter(brands));
                     }
                 }));
     }
@@ -294,7 +343,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
                     @Override
                     protected void onStart() {
                         LOG.info("onStart() download vehicles by manufacturer");
-                        downloadView.setVisibility(View.VISIBLE);
+                        loadingView.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -303,7 +352,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
 
                         mainThreadWorker.schedule(() -> {
                             dispose();
-                            downloadView.setVisibility(View.INVISIBLE);
+                            loadingView.setVisibility(View.INVISIBLE);
                         });
                     }
 
@@ -311,7 +360,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
                     public void onError(Throwable e) {
                         LOG.error(e.getMessage(), e);
                         mainThreadWorker.schedule(() -> {
-                            downloadView.setVisibility(View.INVISIBLE);
+                            loadingView.setVisibility(View.INVISIBLE);
                         });
                     }
 
@@ -323,7 +372,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
                             brands.add(new Brand(null, vehicle));
                         }
 
-                        getActivity().runOnUiThread(() -> {
+                        mainThreadWorker.schedule(() -> {
                             setModelsSelectView();
                             setModelsAdapter(brands);
                         });
@@ -348,7 +397,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
             if (manufacturer != null) {
                 selectedManufacturer = manufacturer;
                 fetchVehiclesByManufacturer(brand.getManufacturer().getHsn());
-                manufacturerText.setText(selectedManufacturer.getName());
+                brandText.setText(selectedManufacturer.getName());
             }
         });
         brandsRecyclerView.scrollToPosition(0);
@@ -365,16 +414,32 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
                 // TODO: Fix keyboard
                 hideKeyboard(getView());
 
-                manufacturerText.setText(selectedManufacturer.getName() + " " + selectedVehicle.getCommercialName());
+                brandText.setText(selectedManufacturer.getName() + " " + selectedVehicle.getCommercialName());
             }
         });
         brandsRecyclerView.scrollToPosition(0);
     }
 
+    private void showRecyclerViewLayout() {
+        slidingUpPanel.setAnchorPoint(0.7f);
+        slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+
+        recyclerViewLayout.setVisibility(View.VISIBLE);
+        wheelPickerLayout.setVisibility(View.GONE);
+    }
+
+    private void showWheelPickerLayout() {
+        slidingUpPanel.setAnchorPoint(0.4f);
+        slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+
+        recyclerViewLayout.setVisibility(View.GONE);
+        wheelPickerLayout.setVisibility(View.VISIBLE);
+    }
+
     private <T> Function<T, Car> createCarFromForm() {
         return t -> {
             // Get the values
-            String[] make = manufacturerText.getText().toString().split("\\s+");
+            String[] make = brandText.getText().toString().split("\\s+");
             String manufacturer = make[0];
             String model = make[1];
             String yearString = constructionYearText.getText().toString();
@@ -432,7 +497,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
                 .translate_slide_out_bottom, () -> ((CarSelectionUiListener) getActivity()).onHideAddCarFragment());
     }
 
-    public void hideKeyboard(View view) {
+    private void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
@@ -443,13 +508,13 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
     }
 
     private void initWatcher() {
-        disposables.add(RxTextView.afterTextChangeEvents(manufacturerText)
+        disposables.add(RxTextView.afterTextChangeEvents(brandText)
                 .debounce(ERROR_DEBOUNCE_TIME, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(t -> t.toString())
+                .map(TextViewAfterTextChangeEvent::toString)
                 .subscribe(model -> {
                     if (model.trim().isEmpty()) {
-                        manufacturerText.setError(getString(R.string.car_selection_error_empty_input));
+                        brandText.setError(getString(R.string.car_selection_error_empty_input));
                     }
                 }, LOG::error));
 
@@ -497,5 +562,17 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment {
                         engineText.requestFocus();
                     }
                 }, LOG::error));
+    }
+
+    @Override
+    public void onPanelSlide(View panel, float slideOffset) {
+        // nothing
+    }
+
+    @Override
+    public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+        if (newState == SlidingUpPanelLayout.PanelState.HIDDEN) {
+            hideKeyboard(getView());
+        }
     }
 }
