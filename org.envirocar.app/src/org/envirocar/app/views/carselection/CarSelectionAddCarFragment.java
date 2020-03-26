@@ -196,8 +196,12 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
             showRecyclerViewLayout();
             setManufacturersSelectView();
             setManufacturerAdapter(manufacturersCache);
+        });;
+        searchView.setOnSearchClickListener(v -> {
+            slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
         });
         searchView.setOnClickListener(v -> {
+            searchView.setIconified(false);
             slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
         });
         backIcon.setOnClickListener(v -> {
@@ -303,7 +307,6 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
                     public void onNext(Car car) {
                         LOG.info("car added");
                         ((CarSelectionUiListener) getActivity()).onCarAdded(car);
-                        hideKeyboard(getView());
                         closeThisFragment();
                     }
                 });
@@ -460,8 +463,6 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
                 brandText.setText(selectedManufacturer.getName() + " " + selectedVehicle.getCommercialName());
 
                 slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-                // TODO: Fix keyboard
-                hideKeyboard(getView());
             }
         });
         brandsRecyclerView.scrollToPosition(0);

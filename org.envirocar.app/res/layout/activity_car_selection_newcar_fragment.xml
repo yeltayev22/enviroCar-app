@@ -374,7 +374,6 @@
                         android:layout_margin="16dp"
                         android:background="@drawable/border_search"
                         app:defaultQueryHint="@string/label_search"
-                        app:iconifiedByDefault="false"
                         app:queryBackground="@null"
                         app:queryHint="@string/label_search"
                         app:searchHintIcon="@null"
