@@ -196,13 +196,26 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
             showRecyclerViewLayout();
             setManufacturersSelectView();
             setManufacturerAdapter(manufacturersCache);
-        });;
+        });
+        ;
         searchView.setOnSearchClickListener(v -> {
             slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
         });
         searchView.setOnClickListener(v -> {
-            searchView.setIconified(false);
             slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+            searchView.setIconified(false);
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                brandAdapter.getFilter().filter(query);
+                return false;
+            }
         });
         backIcon.setOnClickListener(v -> {
             setManufacturersSelectView();
@@ -432,11 +445,13 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
     }
 
     private void setManufacturersSelectView() {
+        searchView.setIconified(true);
         searchTitle.setText(getString(R.string.label_select_manufacturer));
         backIcon.setVisibility(View.GONE);
     }
 
     private void setModelsSelectView() {
+        searchView.setIconified(true);
         searchTitle.setText(getString(R.string.label_select_model));
         backIcon.setVisibility(View.VISIBLE);
     }

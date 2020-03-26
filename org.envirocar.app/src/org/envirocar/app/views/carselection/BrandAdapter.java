@@ -3,6 +3,8 @@ package org.envirocar.app.views.carselection;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -20,10 +22,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class BrandAdapter extends RecyclerView.Adapter<BrandAdapter.BrandViewHolder> {
+public class BrandAdapter extends RecyclerView.Adapter<BrandAdapter.BrandViewHolder> implements Filterable {
 
     private List<Brand> brandsList = new ArrayList<>();
+    private List<Brand> brandsFilterList = new ArrayList<>();
     private OnItemClickListener itemClickListener = null;
+    private BrandFilter brandFilter;
 
     @NonNull
     @Override
@@ -44,15 +48,26 @@ public class BrandAdapter extends RecyclerView.Adapter<BrandAdapter.BrandViewHol
     }
 
     void set(List<Brand> brandList, OnItemClickListener itemClickListener) {
+        clear();
         this.brandsList.addAll(brandList);
+        this.brandsFilterList.addAll(brandList);
         this.itemClickListener = itemClickListener;
         notifyDataSetChanged();
     }
 
     void clear() {
         brandsList.clear();
+        brandsFilterList.clear();
         itemClickListener = null;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public Filter getFilter() {
+        if (brandFilter == null) {
+            brandFilter = new BrandFilter();
+        }
+        return brandFilter;
     }
 
     public static class BrandViewHolder extends RecyclerView.ViewHolder {
@@ -82,9 +97,44 @@ public class BrandAdapter extends RecyclerView.Adapter<BrandAdapter.BrandViewHol
                 nextIcon.setVisibility(View.GONE);
             }
 
-            brandItem.setOnClickListener(v -> {
-                itemClickListener.onItemClick(brand);
-            });
+            brandItem.setOnClickListener(v -> itemClickListener.onItemClick(brand));
+        }
+    }
+
+    private class BrandFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+
+            if (constraint != null && constraint.length() > 0) {
+                List<Brand> filterList = new ArrayList<>();
+                for (int i = 0; i < brandsFilterList.size(); i++) {
+                    Manufacturer manufacturer = brandsFilterList.get(i).getManufacturer();
+                    Vehicle vehicle = brandsFilterList.get(i).getVehicle();
+                    String name;
+                    if (manufacturer != null) {
+                        name = manufacturer.getName();
+                    } else {
+                        name = vehicle.getCommercialName();
+                    }
+
+                    if ((name.toLowerCase()).contains(constraint.toString().toLowerCase())) {
+                        filterList.add(brandsFilterList.get(i));
+                    }
+                }
+                results.count = filterList.size();
+                results.values = filterList;
+            } else {
+                results.count = brandsFilterList.size();
+                results.values = brandsFilterList;
+            }
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            brandsList = (List<Brand>) results.values;
+            notifyDataSetChanged();
         }
 
     }
