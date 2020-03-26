@@ -48,16 +48,19 @@ public class BrandAdapter extends RecyclerView.Adapter<BrandAdapter.BrandViewHol
     }
 
     void set(List<Brand> brandList, OnItemClickListener itemClickListener) {
-        clear();
-        this.brandsList.addAll(brandList);
+        this.brandsFilterList.clear();
         this.brandsFilterList.addAll(brandList);
+        this.brandsList.clear();
+        this.brandsList.addAll(brandList);
+
         this.itemClickListener = itemClickListener;
         notifyDataSetChanged();
     }
 
     void clear() {
-        brandsList.clear();
         brandsFilterList.clear();
+        brandsList.clear();
+
         itemClickListener = null;
         notifyDataSetChanged();
     }

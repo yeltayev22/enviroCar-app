@@ -387,8 +387,6 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
                         }
 
                         manufacturersCache.addAll(brands);
-
-                        mainThreadWorker.schedule(() -> setManufacturerAdapter(brands));
                     }
                 }));
     }
