@@ -118,7 +118,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_directions_car_black_24dp" />
+                        android:src="@drawable/ic_car" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -131,12 +131,18 @@
 
                     <TextView
                         android:id="@+id/brand_text"
-                        android:layout_width="150dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginRight="8dp"
                         android:ellipsize="end"
                         android:gravity="right"
                         android:textSize="12sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_right" />
 
                 </LinearLayout>
 
@@ -154,7 +160,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_date_24dp" />
+                        android:src="@drawable/ic_calendar" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -167,12 +173,18 @@
 
                     <TextView
                         android:id="@+id/construction_year_text"
-                        android:layout_width="150dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginRight="8dp"
                         android:ellipsize="end"
                         android:gravity="right"
                         android:textSize="12sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_right" />
 
                 </LinearLayout>
 
@@ -190,7 +202,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_fuel_consumption" />
+                        android:src="@drawable/ic_fuel" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -203,12 +215,18 @@
 
                     <TextView
                         android:id="@+id/power_source_text"
-                        android:layout_width="150dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginRight="8dp"
                         android:ellipsize="end"
                         android:gravity="right"
                         android:textSize="12sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_right" />
 
                 </LinearLayout>
 
@@ -239,12 +257,18 @@
 
                     <TextView
                         android:id="@+id/engine_displacement_text"
-                        android:layout_width="150dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginRight="8dp"
                         android:ellipsize="end"
                         android:gravity="right"
                         android:textSize="12sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_right" />
 
                 </LinearLayout>
 
