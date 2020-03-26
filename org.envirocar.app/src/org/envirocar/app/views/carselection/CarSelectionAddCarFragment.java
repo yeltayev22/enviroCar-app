@@ -21,6 +21,7 @@ package org.envirocar.app.views.carselection;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -139,6 +140,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
     private CompositeDisposable disposables = new CompositeDisposable();
     private Scheduler.Worker mainThreadWorker = AndroidSchedulers.mainThread().createWorker();
+    final Handler handler = new Handler();
 
     @Nullable
     @Override
@@ -469,18 +471,21 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
     private void showRecyclerViewLayout() {
         slidingUpPanel.setAnchorPoint(0.7f);
-        slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
-
-        recyclerViewLayout.setVisibility(View.VISIBLE);
-        wheelPickerLayout.setVisibility(View.GONE);
+        handler.postDelayed(() -> {
+            slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+            recyclerViewLayout.setVisibility(View.VISIBLE);
+            wheelPickerLayout.setVisibility(View.GONE);
+        }, 50);
     }
 
     private void showWheelPickerLayout() {
         slidingUpPanel.setAnchorPoint(0.4f);
-        slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
 
-        recyclerViewLayout.setVisibility(View.GONE);
-        wheelPickerLayout.setVisibility(View.VISIBLE);
+        handler.postDelayed(() -> {
+            slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+            recyclerViewLayout.setVisibility(View.GONE);
+            wheelPickerLayout.setVisibility(View.VISIBLE);
+        }, 50);
     }
 
     private boolean isNotClickable() {
