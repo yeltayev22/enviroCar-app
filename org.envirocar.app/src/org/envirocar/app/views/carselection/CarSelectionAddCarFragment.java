@@ -189,7 +189,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
         // Initialize brand layout views
         brandLayout.setOnClickListener(v -> {
-            if (!canHandle()) {
+            if (isNotClickable()) {
                 return;
             }
 
@@ -207,7 +207,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
         // Initialize construction year layout views
         constructionYearLayout.setOnClickListener(v -> {
-            if (!canHandle()) {
+            if (isNotClickable()) {
                 return;
             }
 
@@ -227,7 +227,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
         // Initialize fuel type layout views
         powerSourceLayout.setOnClickListener(v -> {
-            if (!canHandle()) {
+            if (isNotClickable()) {
                 return;
             }
 
@@ -246,7 +246,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
         // Initialize engine capacity layout views
         engineLayout.setOnClickListener(v -> {
-            if (!canHandle()) {
+            if (isNotClickable()) {
                 return;
             }
 
@@ -483,9 +483,9 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
         wheelPickerLayout.setVisibility(View.VISIBLE);
     }
 
-    private boolean canHandle() {
+    private boolean isNotClickable() {
         SlidingUpPanelLayout.PanelState currentPanelState = slidingUpPanel.getPanelState();
-        return currentPanelState != SlidingUpPanelLayout.PanelState.ANCHORED && currentPanelState != SlidingUpPanelLayout.PanelState.EXPANDED;
+        return currentPanelState == SlidingUpPanelLayout.PanelState.ANCHORED || currentPanelState == SlidingUpPanelLayout.PanelState.EXPANDED;
     }
 
     private <T> Function<T, Car> createCarFromForm() {

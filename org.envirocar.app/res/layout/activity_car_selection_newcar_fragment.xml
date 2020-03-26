@@ -37,8 +37,10 @@
         android:gravity="bottom"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:umanoAnchorPoint="0.7"
+        app:umanoClipPanel="false"
+        app:umanoFadeColor="@color/transparent"
         app:umanoInitialState="hidden"
-        app:umanoOverlay="true"
+        app:umanoOverlay="false"
         app:umanoPanelHeight="0dp"
         app:umanoScrollableView="@+id/brand_list"
         app:umanoShadowHeight="0dp">
@@ -274,121 +276,117 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
-        <LinearLayout
+        <org.envirocar.app.views.utils.RoundedBottomPanelLayout
+            android:id="@+id/panel"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/border_sliding_panel_rounded"
-            android:clickable="true"
-            android:focusable="true"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/drag_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_drag" />
+            android:background="@color/transparent">
 
             <LinearLayout
-                android:id="@+id/wheel_picker_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <org.envirocar.app.views.utils.WheelPickerView
-                    android:id="@+id/wheel_picker_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_margin="16dp"
-                    app:wheel_atmospheric="true"
-                    app:wheel_curved="true"
-                    app:wheel_indicator="true"
-                    app:wheel_indicator_color="@color/black"
-                    app:wheel_indicator_size="1dp"
-                    app:wheel_item_align="center"
-                    app:wheel_item_space="24dp"
-                    app:wheel_item_text_size="18sp"
-                    app:wheel_same_width="true"
-                    app:wheel_selected_item_text_color="@color/black"
-                    app:wheel_visible_item_count="5" />
-
-                <Button
-                    android:id="@+id/select_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:background="#1A80C1"
-                    android:paddingLeft="80dp"
-                    android:paddingRight="80dp"
-                    android:text="@string/action_select"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/recycler_view_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:background="@color/white"
                 android:orientation="vertical">
 
-                <FrameLayout
+                <LinearLayout
+                    android:id="@+id/wheel_picker_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp">
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginRight="50dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
-                    <ImageView
-                        android:id="@+id/back_icon"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                    <org.envirocar.app.views.utils.WheelPickerView
+                        android:id="@+id/wheel_picker_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:rotation="180"
-                        android:src="@drawable/ic_arrow_right" />
+                        android:layout_margin="16dp"
+                        app:wheel_atmospheric="true"
+                        app:wheel_curved="true"
+                        app:wheel_indicator="true"
+                        app:wheel_indicator_color="@color/black"
+                        app:wheel_indicator_size="1dp"
+                        app:wheel_item_align="center"
+                        app:wheel_item_space="24dp"
+                        app:wheel_item_text_size="18sp"
+                        app:wheel_same_width="true"
+                        app:wheel_selected_item_text_color="@color/black"
+                        app:wheel_visible_item_count="5" />
 
-                    <TextView
-                        android:id="@+id/search_title"
+                    <Button
+                        android:id="@+id/select_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:textColor="@color/black"
+                        android:layout_gravity="center_horizontal"
+                        android:background="#1A80C1"
+                        android:paddingLeft="80dp"
+                        android:paddingRight="80dp"
+                        android:text="@string/action_select"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
                         android:textSize="16sp" />
-                </FrameLayout>
+                </LinearLayout>
 
-                <View
+                <LinearLayout
+                    android:id="@+id/recycler_view_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/envirocar_color_divider_grey" />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                <androidx.appcompat.widget.SearchView
-                    android:id="@+id/search_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:background="@drawable/border_search"
-                    app:defaultQueryHint="@string/label_search"
-                    app:iconifiedByDefault="false"
-                    app:queryBackground="@null"
-                    app:queryHint="@string/label_search"
-                    app:searchHintIcon="@null"
-                    app:searchIcon="@drawable/ic_search" />
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="16dp">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/brand_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                        <ImageView
+                            android:id="@+id/back_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:rotation="180"
+                            android:src="@drawable/ic_arrow_right" />
+
+                        <TextView
+                            android:id="@+id/search_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+                    </FrameLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/envirocar_color_divider_grey" />
+
+                    <androidx.appcompat.widget.SearchView
+                        android:id="@+id/search_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:background="@drawable/border_search"
+                        app:defaultQueryHint="@string/label_search"
+                        app:iconifiedByDefault="false"
+                        app:queryBackground="@null"
+                        app:queryHint="@string/label_search"
+                        app:searchHintIcon="@null"
+                        app:searchIcon="@drawable/ic_search" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/brand_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </LinearLayout>
+
             </LinearLayout>
-
-        </LinearLayout>
+        </org.envirocar.app.views.utils.RoundedBottomPanelLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 </LinearLayout>
