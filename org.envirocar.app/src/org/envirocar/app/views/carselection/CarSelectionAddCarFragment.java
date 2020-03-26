@@ -184,14 +184,20 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
         brandsRecyclerView.setAdapter(brandAdapter);
         brandsRecyclerView.addItemDecoration(new DividerItemDecoration(brandsRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
+        // Initialize sliding up panel layout
+        slidingUpPanel.addPanelSlideListener(this);
+
         // Initialize brand layout views
         brandLayout.setOnClickListener(v -> {
+            if (!canHandle()) {
+                return;
+            }
+
             showRecyclerViewLayout();
             setManufacturersSelectView();
             setManufacturerAdapter(manufacturersCache);
         });
         searchView.setOnClickListener(v -> {
-            searchView.setIconified(false);
             slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
         });
         backIcon.setOnClickListener(v -> {
@@ -201,6 +207,10 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
         // Initialize construction year layout views
         constructionYearLayout.setOnClickListener(v -> {
+            if (!canHandle()) {
+                return;
+            }
+
             currentStep = Step.CONSTRUCTION_YEAR;
             showWheelPickerLayout();
 
@@ -217,6 +227,10 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
         // Initialize fuel type layout views
         powerSourceLayout.setOnClickListener(v -> {
+            if (!canHandle()) {
+                return;
+            }
+
             currentStep = Step.POWER_SOURCE;
             showWheelPickerLayout();
 
@@ -232,6 +246,10 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
         // Initialize engine capacity layout views
         engineLayout.setOnClickListener(v -> {
+            if (!canHandle()) {
+                return;
+            }
+
             currentStep = Step.ENGINE_DISPLACEMENT;
             showWheelPickerLayout();
 
@@ -465,6 +483,11 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
         wheelPickerLayout.setVisibility(View.VISIBLE);
     }
 
+    private boolean canHandle() {
+        SlidingUpPanelLayout.PanelState currentPanelState = slidingUpPanel.getPanelState();
+        return currentPanelState != SlidingUpPanelLayout.PanelState.ANCHORED && currentPanelState != SlidingUpPanelLayout.PanelState.EXPANDED;
+    }
+
     private <T> Function<T, Car> createCarFromForm() {
         return t -> {
             // Get the values
@@ -600,7 +623,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
     @Override
     public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-        if (newState == SlidingUpPanelLayout.PanelState.HIDDEN) {
+        if (newState == SlidingUpPanelLayout.PanelState.HIDDEN || newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
             hideKeyboard(getView());
         }
     }

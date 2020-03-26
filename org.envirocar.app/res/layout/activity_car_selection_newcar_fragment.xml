@@ -32,7 +32,7 @@
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
         android:id="@+id/sliding_up_panel"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:gravity="bottom"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -255,6 +255,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/border_sliding_panel_rounded"
+            android:clickable="true"
+            android:focusable="true"
             android:orientation="vertical">
 
             <ImageView
@@ -352,6 +354,7 @@
                     android:layout_margin="16dp"
                     android:background="@drawable/border_search"
                     app:defaultQueryHint="@string/label_search"
+                    app:iconifiedByDefault="false"
                     app:queryBackground="@null"
                     app:queryHint="@string/label_search"
                     app:searchHintIcon="@null"
