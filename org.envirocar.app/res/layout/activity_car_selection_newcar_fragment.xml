@@ -32,12 +32,11 @@
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
         android:id="@+id/sliding_up_panel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:gravity="bottom"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:umanoAnchorPoint="0.7"
-        app:umanoDragView="@+id/drag_view"
         app:umanoInitialState="hidden"
         app:umanoOverlay="true"
         app:umanoPanelHeight="0dp"
