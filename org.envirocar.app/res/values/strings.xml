@@ -84,6 +84,7 @@
     <string name="label_select_manufacturer">Select manufacturer ...</string>
     <string name="label_select_model">Select model ...</string>
     <string name="action_select">Select</string>
+    <string name="form_error">Please, select all the fields</string>
 
     <string name="driving">Driving</string>
 

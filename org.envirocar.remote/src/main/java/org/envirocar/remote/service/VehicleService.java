@@ -22,5 +22,5 @@ public interface VehicleService {
     Observable<List<PowerSource>> fetchPowerSources();
 
     @GET("manufacturers/{hsn}/vehicles/{tsn}")
-    Observable<List<Vehicle>> fetchVehicle(@Path("hsn") String hsn, @Path("tsn") String tsn);
+    Observable<Vehicle> fetchVehicle(@Path("hsn") String hsn, @Path("tsn") String tsn);
 }
