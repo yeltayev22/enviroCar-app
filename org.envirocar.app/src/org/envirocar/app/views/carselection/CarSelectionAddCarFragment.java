@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -101,10 +102,10 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
     protected LinearLayout constructionYearLayout;
     @BindView(R.id.construction_year_text)
     protected TextView constructionYearText;
-    @BindView(R.id.fuel_type_layout)
-    protected LinearLayout fuelTypeLayout;
-    @BindView(R.id.fuel_type_text)
-    protected TextView fuelTypeText;
+    @BindView(R.id.power_source_layout)
+    protected LinearLayout powerSourceLayout;
+    @BindView(R.id.power_source_text)
+    protected TextView powerSourceText;
     @BindView(R.id.engine_displacement_layout)
     protected LinearLayout engineLayout;
     @BindView(R.id.engine_displacement_text)
@@ -118,6 +119,8 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
     protected LinearLayout wheelPickerLayout;
     @BindView(R.id.wheel_picker_view)
     protected WheelPickerView wheelPickerView;
+    @BindView(R.id.select_button)
+    protected Button selectButton;
 
     @BindView(R.id.back_icon)
     protected ImageView backIcon;
@@ -133,9 +136,13 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
     private Vehicle selectedVehicle;
     private BrandAdapter brandAdapter;
 
+    private Step currentStep;
     private List<String> years = new ArrayList<>();
-    private List<String> fuelTypes = new ArrayList<>();
+    private List<String> powerSources = new ArrayList<>();
     private List<String> engineTypes = new ArrayList<>();
+    private String selectedYear;
+    private String selectedPowerSource;
+    private String selectedEngineCapacity;
 
     private CompositeDisposable disposables = new CompositeDisposable();
     private Scheduler.Worker mainThreadWorker = AndroidSchedulers.mainThread().createWorker();
@@ -194,7 +201,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
         // Initialize construction year layout views
         constructionYearLayout.setOnClickListener(v -> {
-
+            currentStep = Step.CONSTRUCTION_YEAR;
             showWheelPickerLayout();
 
             years.clear();
@@ -209,21 +216,23 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
         });
 
         // Initialize fuel type layout views
-        fuelTypeLayout.setOnClickListener(v -> {
+        powerSourceLayout.setOnClickListener(v -> {
+            currentStep = Step.POWER_SOURCE;
             showWheelPickerLayout();
 
-            fuelTypes.clear();
-            fuelTypes.add("Electric");
-            fuelTypes.add("Benzine");
-            fuelTypes.add("Gas");
-            fuelTypes.add("Hybrid");
-            fuelTypes.add("Diesel");
-            fuelTypes.add("Gas-Hybrid");
-            wheelPickerView.setData(fuelTypes);
+            powerSources.clear();
+            powerSources.add("Electric");
+            powerSources.add("Benzine");
+            powerSources.add("Gas");
+            powerSources.add("Hybrid");
+            powerSources.add("Diesel");
+            powerSources.add("Gas-Hybrid");
+            wheelPickerView.setData(powerSources);
         });
 
         // Initialize engine capacity layout views
         engineLayout.setOnClickListener(v -> {
+            currentStep = Step.ENGINE_DISPLACEMENT;
             showWheelPickerLayout();
 
             engineTypes.clear();
@@ -232,6 +241,27 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
             engineTypes.add("1533");
             engineTypes.add("1700");
             wheelPickerView.setData(engineTypes);
+        });
+
+        // Initialize select button
+        selectButton.setOnClickListener(v -> {
+            int selectedPosition = wheelPickerView.getCurrentItemPosition();
+            switch (currentStep) {
+                case CONSTRUCTION_YEAR:
+                    selectedYear = years.get(selectedPosition);
+                    constructionYearText.setText(selectedYear);
+                    break;
+                case POWER_SOURCE:
+                    selectedPowerSource = powerSources.get(selectedPosition);
+                    powerSourceText.setText(selectedPowerSource);
+                    break;
+                case ENGINE_DISPLACEMENT:
+                    selectedEngineCapacity = engineTypes.get(selectedPosition);
+                    engineText.setText(selectedEngineCapacity);
+                    break;
+            }
+
+            slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
         });
 
         // Handle toolbar done action
@@ -409,12 +439,11 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
             Vehicle vehicle = brand.getVehicle();
             if (vehicle != null) {
                 selectedVehicle = vehicle;
-                slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+                brandText.setText(selectedManufacturer.getName() + " " + selectedVehicle.getCommercialName());
 
+                slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                 // TODO: Fix keyboard
                 hideKeyboard(getView());
-
-                brandText.setText(selectedManufacturer.getName() + " " + selectedVehicle.getCommercialName());
             }
         });
         brandsRecyclerView.scrollToPosition(0);
@@ -446,7 +475,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
             String engineString = engineText.getText().toString();
 
             Car.FuelType fueltype = Car.FuelType.getFuelTybeByTranslatedString(getContext(),
-                    fuelTypeText.getText().toString());
+                    powerSourceText.getText().toString());
 
             // create the car
             int year = Integer.parseInt(yearString);

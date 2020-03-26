@@ -177,7 +177,7 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/fuel_type_layout"
+                    android:id="@+id/power_source_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -202,7 +202,7 @@
                         android:textSize="16sp" />
 
                     <TextView
-                        android:id="@+id/fuel_type_text"
+                        android:id="@+id/power_source_text"
                         android:layout_width="150dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
