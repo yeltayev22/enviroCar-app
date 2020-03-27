@@ -125,7 +125,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
-                        android:text="@string/car_selection_manufacturer"
+                        android:text="@string/label_brand"
                         android:textColor="#000000"
                         android:textSize="16sp" />
 
@@ -173,7 +173,7 @@
 
                     <TextView
                         android:id="@+id/construction_year_text"
-                        android:layout_width="120dp"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginRight="8dp"
@@ -251,13 +251,13 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
-                        android:text="@string/car_selection_engine_displacement"
+                        android:text="@string/label_engine_capacity"
                         android:textColor="#000000"
                         android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/engine_displacement_text"
-                        android:layout_width="120dp"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginRight="8dp"
@@ -303,7 +303,7 @@
         <org.envirocar.app.views.utils.RoundedBottomPanelLayout
             android:id="@+id/panel"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@color/transparent">
 
             <LinearLayout
@@ -311,6 +311,36 @@
                 android:layout_height="match_parent"
                 android:background="@color/white"
                 android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:id="@+id/back_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="4dp"
+                        android:rotation="180"
+                        android:src="@drawable/ic_arrow_right" />
+
+                    <TextView
+                        android:id="@+id/search_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                </FrameLayout>
 
                 <LinearLayout
                     android:id="@+id/wheel_picker_layout"
@@ -358,33 +388,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginBottom="16dp">
-
-                        <ImageView
-                            android:id="@+id/back_icon"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center_vertical"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:rotation="180"
-                            android:src="@drawable/ic_arrow_right" />
-
-                        <TextView
-                            android:id="@+id/search_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:textColor="@color/black"
-                            android:textSize="16sp" />
-                    </FrameLayout>
 
                     <View
                         android:layout_width="match_parent"

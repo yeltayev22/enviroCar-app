@@ -48,6 +48,7 @@ import org.envirocar.app.R;
 import org.envirocar.app.injection.BaseInjectorFragment;
 import org.envirocar.app.retrofit.RetrofitClient;
 import org.envirocar.app.views.utils.ECAnimationUtils;
+import org.envirocar.app.views.utils.RoundedBottomPanelLayout;
 import org.envirocar.app.views.utils.WheelPickerView;
 import org.envirocar.core.entity.Car;
 import org.envirocar.core.entity.CarImpl;
@@ -124,6 +125,8 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
     protected SearchView searchView;
     @BindView(R.id.brand_list)
     protected RecyclerView brandsRecyclerView;
+    @BindView(R.id.panel)
+    protected RoundedBottomPanelLayout roundedBottomPanel;
 
     private List<Brand> manufacturersCache = new ArrayList<>();
     private Manufacturer selectedManufacturer;
@@ -187,6 +190,8 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
                 return;
             }
 
+            currentStep = Step.BRAND_AND_MODEL;
+
             showRecyclerViewLayout();
             setManufacturersSelectView();
             setManufacturerAdapter(manufacturersCache);
@@ -220,6 +225,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
                 return;
             }
 
+            searchTitle.setText(getString(R.string.label_select_year));
             currentStep = Step.CONSTRUCTION_YEAR;
             showWheelPickerLayout();
 
@@ -240,6 +246,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
                 return;
             }
 
+            searchTitle.setText(getString(R.string.label_select_fuel));
             currentStep = Step.POWER_SOURCE;
             showWheelPickerLayout();
 
@@ -258,6 +265,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
                 return;
             }
 
+            searchTitle.setText(getString(R.string.label_select_engine_capacity));
             currentStep = Step.ENGINE_DISPLACEMENT;
             showWheelPickerLayout();
 
@@ -288,6 +296,12 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
             }
 
             slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+        });
+
+        roundedBottomPanel.setOnClickListener(v -> {
+            if (currentStep == Step.CONSTRUCTION_YEAR || currentStep == Step.POWER_SOURCE || currentStep == Step.ENGINE_DISPLACEMENT) {
+                slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
         });
 
         // Handle toolbar done action
@@ -471,6 +485,8 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
 
     private void showRecyclerViewLayout() {
         slidingUpPanel.setAnchorPoint(0.7f);
+        slidingUpPanel.setTouchEnabled(true);
+
         handler.postDelayed(() -> {
             slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
             recyclerViewLayout.setVisibility(View.VISIBLE);
@@ -479,7 +495,8 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
     }
 
     private void showWheelPickerLayout() {
-        slidingUpPanel.setAnchorPoint(0.4f);
+        slidingUpPanel.setAnchorPoint(0.45f);
+        slidingUpPanel.setTouchEnabled(false);
 
         handler.postDelayed(() -> {
             slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);

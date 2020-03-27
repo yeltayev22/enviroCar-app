@@ -81,10 +81,16 @@
     <string name="ok" translatable="false">OK</string>
 
     <string name="label_search">Search</string>
-    <string name="label_select_manufacturer">Select manufacturer ...</string>
-    <string name="label_select_model">Select model ...</string>
+    <string name="label_select_manufacturer">Select manufacturer</string>
+    <string name="label_select_model">Select model</string>
+    <string name="label_select_year">Select construction year</string>
+    <string name="label_select_fuel">Select fuel type</string>
+    <string name="label_select_engine_capacity">Select engine capacity</string>
+
     <string name="action_select">Select</string>
     <string name="form_error">Please, select all the fields</string>
+    <string name="label_engine_capacity">Engine capacity (ccm³)</string>
+    <string name="label_brand">Brand and Model</string>
 
     <string name="driving">Driving</string>
 
