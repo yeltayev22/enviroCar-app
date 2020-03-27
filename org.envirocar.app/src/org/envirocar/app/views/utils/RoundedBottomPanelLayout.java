@@ -47,7 +47,7 @@ public class RoundedBottomPanelLayout extends ViewGroup implements SlidingUpPane
     private boolean isHandlePathInvalid = true;
     private Paint handlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    public RectF handleBarRect = new RectF();
+    public  RectF handleBarRect = new RectF();
     private float handleBarWidth = dpToPx(24f);
     private float handleBarHeight = dpToPx(5f);
     private Paint handleBarPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

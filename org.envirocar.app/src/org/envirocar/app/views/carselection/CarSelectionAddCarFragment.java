@@ -225,6 +225,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
                 return;
             }
 
+            backIcon.setVisibility(View.GONE);
             searchTitle.setText(getString(R.string.label_select_year));
             currentStep = Step.CONSTRUCTION_YEAR;
             showWheelPickerLayout();
@@ -246,6 +247,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
                 return;
             }
 
+            backIcon.setVisibility(View.GONE);
             searchTitle.setText(getString(R.string.label_select_fuel));
             currentStep = Step.POWER_SOURCE;
             showWheelPickerLayout();
@@ -265,6 +267,7 @@ public class CarSelectionAddCarFragment extends BaseInjectorFragment implements 
                 return;
             }
 
+            backIcon.setVisibility(View.GONE);
             searchTitle.setText(getString(R.string.label_select_engine_capacity));
             currentStep = Step.ENGINE_DISPLACEMENT;
             showWheelPickerLayout();
